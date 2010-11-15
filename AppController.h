@@ -9,9 +9,12 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface AppController : NSObject {
+@interface AppController : NSObject <NSSpeechSynthesizerDelegate> {
 	IBOutlet NSTextField *textField;
 	NSSpeechSynthesizer *speechSynth;
+	
+	IBOutlet NSButton *stopButton;
+	IBOutlet NSButton *startButton;
 
 }
 - (IBAction)sayIt:(id)sender;
