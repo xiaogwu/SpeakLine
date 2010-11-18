@@ -18,6 +18,7 @@
 	
 	speechSynth = [[NSSpeechSynthesizer alloc] initWithVoice:nil];
 	[speechSynth setDelegate:self];
+	voiceList = [[NSSpeechSynthesizer availableVoices] retain];
 	return self;
 }
 
@@ -39,11 +40,37 @@
 	[speechSynth stopSpeaking];
 }
 
-- (void)speechSynthesizer:(NSSpeechSynthesizer *)sender
-		didFinishSpeaking:(BOOL)complete {
+- (void)speechSynthesizer:(NSSpeechSynthesizer *)sender didFinishSpeaking:(BOOL)complete {
 	NSLog(@"complete = %d", complete);
 	[stopButton setEnabled:NO];
 	[startButton setEnabled:YES];
 }
 
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
+	return [voiceList count];
+}
+
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+	NSString *v = [voiceList objectAtIndex:row];
+	NSDictionary *dict = [NSSpeechSynthesizer attributesForVoice:v];
+	return [dict objectForKey:NSVoiceName];
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification {
+	NSInteger row = [tableView selectedRow];
+	if (row == -1) {
+		return;
+	}
+	NSString *selectedVoice = [voiceList objectAtIndex:row];
+	NSLog(@"new voice = %@", selectedVoice);
+	[speechSynth setVoice:selectedVoice];
+	NSString *string = [textField stringValue];
+	
+	if ([string length] == 0) {
+		NSLog(@"String from %@ is of zero-length", textField);
+		return;
+	}
+	
+	[speechSynth startSpeakingString:string];
+}
 @end
